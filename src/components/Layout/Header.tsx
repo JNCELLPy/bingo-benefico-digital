@@ -2,106 +2,170 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   User, 
-  Wallet, 
   LogOut, 
   Settings, 
-  Bell,
-  Menu
+  Wallet,
+  Home,
+  Gift,
+  Play
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const { usuario, cerrarSesion } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const formatearSaldo = (saldo: number) => {
+  const formatearMoneda = (valor: number) => {
     return new Intl.NumberFormat('es-PY', {
       style: 'currency',
       currency: 'PYG',
       minimumFractionDigits: 0
-    }).format(saldo);
+    }).format(valor);
   };
 
+  const navegarA = (ruta: string) => {
+    navigate(ruta);
+  };
+
+  const isActive = (path: string) => location.pathname === path;
+
   return (
-    <header className="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="bg-white text-blue-600 p-2 rounded-lg font-bold text-xl">
-              B
+    <header className="bg-white shadow-md border-b">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex justify-between items-center">
+          {/* Logo y Navegación */}
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-2 rounded-lg">
+                <div className="text-xl font-bold">B</div>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-800">BingoMax</h1>
+                <p className="text-xs text-gray-500">Sistema Integral</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold">BingoMax</h1>
-              <p className="text-sm opacity-90">Sistema de Bingo y Rifas</p>
-            </div>
+            
+            {/* Navegación */}
+            <nav className="hidden md:flex space-x-1">
+              <Button
+                variant={isActive('/') ? 'default' : 'ghost'}
+                onClick={() => navegarA('/')}
+                className="flex items-center space-x-2"
+              >
+                <Home className="h-4 w-4" />
+                <span>Dashboard</span>
+              </Button>
+              
+              <Button
+                variant={isActive('/rifas') ? 'default' : 'ghost'}
+                onClick={() => navegarA('/rifas')}
+                className="flex items-center space-x-2"
+              >
+                <Gift className="h-4 w-4" />
+                <span>Rifas</span>
+              </Button>
+              
+              <Button
+                variant={isActive('/bingo-vivo') ? 'default' : 'ghost'}
+                onClick={() => navegarA('/bingo-vivo')}
+                className="flex items-center space-x-2"
+              >
+                <Play className="h-4 w-4" />
+                <span>Bingo en Vivo</span>
+              </Button>
+            </nav>
           </div>
 
-          {/* Usuario y Navegación */}
-          {usuario && (
-            <div className="flex items-center space-x-4">
-              {/* Saldo */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
+          {/* Usuario y Controles */}
+          <div className="flex items-center space-x-4">
+            {/* Saldo */}
+            <div className="hidden sm:flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-lg">
+              <Wallet className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-semibold text-green-800">
+                {formatearMoneda(usuario?.saldo || 0)}
+              </span>
+            </div>
+
+            {/* Información del Usuario */}
+            <div className="flex items-center space-x-3">
+              <div className="hidden sm:block text-right">
+                <p className="text-sm font-semibold text-gray-800">
+                  {usuario?.nombre} {usuario?.apellido}
+                </p>
                 <div className="flex items-center space-x-2">
-                  <Wallet className="h-4 w-4" />
-                  <span className="font-semibold">
-                    {formatearSaldo(usuario.saldo)}
-                  </span>
+                  <Badge 
+                    variant={usuario?.rol === 'super_admin' || usuario?.rol === 'admin' ? 'default' : 'secondary'}
+                    className="text-xs"
+                  >
+                    {usuario?.rol?.replace('_', ' ').toUpperCase()}
+                  </Badge>
+                  <Badge 
+                    variant={usuario?.estado === 'verificado' ? 'default' : 'secondary'}
+                    className="text-xs"
+                  >
+                    {usuario?.estado?.toUpperCase()}
+                  </Badge>
                 </div>
               </div>
-
-              {/* Notificaciones */}
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-5 w-5" />
-                <Badge className="absolute -top-2 -right-2 bg-red-500 text-white px-2 py-1 text-xs">
-                  3
-                </Badge>
-              </Button>
-
-              {/* Menú de Usuario */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2">
-                    <div className="bg-white/20 p-2 rounded-full">
-                      <User className="h-4 w-4" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium">{usuario.nombre} {usuario.apellido}</p>
-                      <p className="text-xs opacity-75 capitalize">{usuario.rol.replace('_', ' ')}</p>
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Mi Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Wallet className="mr-2 h-4 w-4" />
-                    Mi Billetera
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Configuración
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={cerrarSesion}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Cerrar Sesión
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm">
+                  <User className="h-4 w-4" />
+                </Button>
+                
+                <Button variant="ghost" size="sm">
+                  <Settings className="h-4 w-4" />
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={cerrarSesion}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          )}
+          </div>
         </div>
+
+        {/* Navegación móvil */}
+        <nav className="md:hidden flex justify-center space-x-1 mt-3 pt-3 border-t">
+          <Button
+            variant={isActive('/') ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => navegarA('/')}
+            className="flex items-center space-x-1"
+          >
+            <Home className="h-4 w-4" />
+            <span className="text-xs">Dashboard</span>
+          </Button>
+          
+          <Button
+            variant={isActive('/rifas') ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => navegarA('/rifas')}
+            className="flex items-center space-x-1"
+          >
+            <Gift className="h-4 w-4" />
+            <span className="text-xs">Rifas</span>
+          </Button>
+          
+          <Button
+            variant={isActive('/bingo-vivo') ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => navegarA('/bingo-vivo')}
+            className="flex items-center space-x-1"
+          >
+            <Play className="h-4 w-4" />
+            <span className="text-xs">Bingo</span>
+          </Button>
+        </nav>
       </div>
     </header>
   );

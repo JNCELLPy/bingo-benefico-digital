@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "@/components/Auth/Login";
 import Dashboard from "@/pages/Dashboard";
+import Rifas from "@/pages/Rifas";
+import BingoEnVivo from "@/pages/BingoEnVivo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,8 @@ const AppContent = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/rifas" element={<Rifas />} />
+        <Route path="/bingo-vivo" element={<BingoEnVivo />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
