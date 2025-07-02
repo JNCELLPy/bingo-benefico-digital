@@ -5,6 +5,7 @@ import Header from '@/components/Layout/Header';
 import CartonBingo from '@/components/Bingo/CartonBingo';
 import SorteoEnVivo from '@/components/Sorteo/SorteoEnVivo';
 import PanelAdministrativo from '@/components/Admin/PanelAdministrativo';
+import PanelVendedor from '@/components/Vendedor/PanelVendedor';
 import BilleteraVirtual from '@/components/Billetera/BilleteraVirtual';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,8 @@ import {
   Trophy, 
   Calendar,
   Users,
-  Gamepad2
+  Gamepad2,
+  AlertCircle
 } from 'lucide-react';
 import { Carton, Sorteo } from '@/types/bingo';
 
@@ -91,9 +93,21 @@ const Dashboard = () => {
       case 'admin':
         return <PanelAdministrativo />;
       
-      default:
+      case 'vendedor':
+        return <PanelVendedor />;
+      
+      case 'jugador':
         return (
           <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center">
+                <AlertCircle className="h-5 w-5 text-blue-600 mr-2" />
+                <p className="text-blue-800">
+                  Bienvenido jugador. Puedes participar en sorteos, comprar cartones y gestionar tu billetera.
+                </p>
+              </div>
+            </div>
+
             {/* Resumen Rápido */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card>
@@ -216,6 +230,17 @@ const Dashboard = () => {
                 <BilleteraVirtual />
               </TabsContent>
             </Tabs>
+          </div>
+        );
+      
+      default:
+        return (
+          <div className="text-center py-12">
+            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Acceso Restringido</h3>
+            <p className="text-muted-foreground">
+              No tienes permisos para acceder a esta sección.
+            </p>
           </div>
         );
     }

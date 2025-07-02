@@ -5,6 +5,9 @@ import Header from '@/components/Layout/Header';
 import CrearRifa from '@/components/Rifa/CrearRifa';
 import RifaCard from '@/components/Rifa/RifaCard';
 import SorteadorRifa from '@/components/Rifa/SorteadorRifa';
+import BuscadorBoletas from '@/components/Rifa/BuscadorBoletas';
+import CuentaRegresiva from '@/components/Rifa/CuentaRegresiva';
+import HistorialPremios from '@/components/Rifa/HistorialPremios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,7 +22,7 @@ const Rifas = () => {
       id: '1',
       nombre: 'Rifa del Día de la Madre',
       descripcion: 'Participa y gana increíbles premios para mamá',
-      fechaSorteo: '2024-05-10T00:00:00.000Z',
+      fechaSorteo: '2024-05-15',
       horaSorteo: '20:00',
       estado: 'activa',
       precioNumero: 10000,
@@ -124,6 +127,28 @@ const Rifas = () => {
           )}
         </div>
 
+        {/* Rifas Activas con Cuenta Regresiva */}
+        {rifas.filter(r => r.estado === 'activa').length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Rifas Activas</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {rifas.filter(r => r.estado === 'activa').map(rifa => (
+                <CuentaRegresiva
+                  key={rifa.id}
+                  fechaSorteo={rifa.fechaSorteo}
+                  horaSorteo={rifa.horaSorteo}
+                  nombreRifa={rifa.nombre}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Buscador de Boletas */}
+        <div className="mb-8">
+          <BuscadorBoletas />
+        </div>
+
         {/* Estadísticas Rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
@@ -205,6 +230,7 @@ const Rifas = () => {
             <TabsTrigger value="activas">Rifas Activas</TabsTrigger>
             <TabsTrigger value="programadas">Programadas</TabsTrigger>
             <TabsTrigger value="finalizadas">Finalizadas</TabsTrigger>
+            <TabsTrigger value="historial">Historial de Premios</TabsTrigger>
             {esAdmin && <TabsTrigger value="administrar">Administrar</TabsTrigger>}
           </TabsList>
 
@@ -264,6 +290,10 @@ const Rifas = () => {
                 </div>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="historial" className="space-y-4">
+            <HistorialPremios />
           </TabsContent>
 
           {esAdmin && (

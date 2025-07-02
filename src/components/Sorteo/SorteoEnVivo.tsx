@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Play, Pause, Square, Volume2 } from 'lucide-react';
 import { Sorteo } from '@/types/bingo';
+import TableroBingo from '@/components/Bingo/TableroBingo';
+import UltimosNumeros from '@/components/Bingo/UltimosNumeros';
 
 interface SorteoEnVivoProps {
   sorteo: Sorteo;
@@ -18,8 +20,10 @@ const SorteoEnVivo: React.FC<SorteoEnVivoProps> = ({
   onFinalizarSorteo
 }) => {
   const [enCurso, setEnCurso] = useState(false);
+  const [pausado, setPausado] = useState(false);
   const [ultimoNumero, setUltimoNumero] = useState<number | null>(null);
   const [numerosDisponibles, setNumerosDisponibles] = useState<number[]>([]);
+  const [intervaloRef, setIntervaloRef] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Inicializar números disponibles (1-75 para bingo tradicional)
@@ -31,6 +35,7 @@ const SorteoEnVivo: React.FC<SorteoEnVivoProps> = ({
   const sacarProximoNumero = () => {
     if (numerosDisponibles.length === 0) {
       setEnCurso(false);
+      setPausado(false);
       onFinalizarSorteo();
       return;
     }
@@ -62,21 +67,57 @@ const SorteoEnVivo: React.FC<SorteoEnVivoProps> = ({
 
   const iniciarSorteo = () => {
     setEnCurso(true);
+    setPausado(false);
+    
     const intervalo = setInterval(() => {
       if (numerosDisponibles.length > 0) {
         sacarProximoNumero();
       } else {
         clearInterval(intervalo);
         setEnCurso(false);
+        setPausado(false);
         onFinalizarSorteo();
       }
     }, sorteo.configuracion.tiempoEntreBolas * 1000);
 
-    return () => clearInterval(intervalo);
+    setIntervaloRef(intervalo);
   };
 
   const pausarSorteo = () => {
+    setPausado(true);
     setEnCurso(false);
+    if (intervaloRef) {
+      clearInterval(intervaloRef);
+      setIntervaloRef(null);
+    }
+  };
+
+  const continuarSorteo = () => {
+    setPausado(false);
+    setEnCurso(true);
+    
+    const intervalo = setInterval(() => {
+      if (numerosDisponibles.length > 0) {
+        sacarProximoNumero();
+      } else {
+        clearInterval(intervalo);
+        setEnCurso(false);
+        setPausado(false);
+        onFinalizarSorteo();
+      }
+    }, sorteo.configuracion.tiempoEntreBolas * 1000);
+
+    setIntervaloRef(intervalo);
+  };
+
+  const finalizarSorteo = () => {
+    setEnCurso(false);
+    setPausado(false);
+    if (intervaloRef) {
+      clearInterval(intervaloRef);
+      setIntervaloRef(null);
+    }
+    onFinalizarSorteo();
   };
 
   return (
@@ -112,16 +153,18 @@ const SorteoEnVivo: React.FC<SorteoEnVivoProps> = ({
 
           {/* Controles */}
           <div className="flex justify-center space-x-4">
-            {!enCurso ? (
+            {!enCurso && !pausado && (
               <Button 
                 onClick={iniciarSorteo}
                 size="lg"
                 className="bg-green-500 hover:bg-green-600"
               >
                 <Play className="mr-2 h-5 w-5" />
-                {sorteo.numerosLlamados.length === 0 ? 'Iniciar Sorteo' : 'Continuar'}
+                {sorteo.numerosLlamados.length === 0 ? 'Iniciar Sorteo' : 'Iniciar'}
               </Button>
-            ) : (
+            )}
+            
+            {enCurso && !pausado && (
               <Button 
                 onClick={pausarSorteo}
                 size="lg"
@@ -129,6 +172,17 @@ const SorteoEnVivo: React.FC<SorteoEnVivoProps> = ({
               >
                 <Pause className="mr-2 h-5 w-5" />
                 Pausar
+              </Button>
+            )}
+
+            {pausado && (
+              <Button 
+                onClick={continuarSorteo}
+                size="lg"
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                <Play className="mr-2 h-5 w-5" />
+                Continuar
               </Button>
             )}
             
@@ -143,7 +197,7 @@ const SorteoEnVivo: React.FC<SorteoEnVivoProps> = ({
             </Button>
             
             <Button 
-              onClick={onFinalizarSorteo}
+              onClick={finalizarSorteo}
               size="lg"
               className="bg-red-500 hover:bg-red-600"
             >
@@ -154,31 +208,21 @@ const SorteoEnVivo: React.FC<SorteoEnVivoProps> = ({
         </CardContent>
       </Card>
 
-      {/* Historial de Números Llamados */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Números Llamados</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-15 gap-2">
-            {Array.from({ length: 75 }, (_, i) => i + 1).map(numero => (
-              <div
-                key={numero}
-                className={`
-                  w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
-                  ${sorteo.numerosLlamados.includes(numero)
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-500'
-                  }
-                  ${numero === ultimoNumero ? 'ring-4 ring-yellow-400' : ''}
-                `}
-              >
-                {numero}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Tablero de Bingo y Últimos Números */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <TableroBingo 
+            numerosLlamados={sorteo.numerosLlamados}
+            ultimoNumero={ultimoNumero}
+          />
+        </div>
+        <div>
+          <UltimosNumeros 
+            numerosLlamados={sorteo.numerosLlamados}
+            cantidadMostrar={8}
+          />
+        </div>
+      </div>
     </div>
   );
 };
