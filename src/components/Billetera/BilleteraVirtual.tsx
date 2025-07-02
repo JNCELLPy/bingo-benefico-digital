@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import {
   Plus, 
   Minus, 
   CreditCard, 
-  Bank, 
+  Building2, 
   Smartphone,
   History,
   AlertCircle,
@@ -149,7 +148,7 @@ const BilleteraVirtual = () => {
                     onClick={() => setMetodoSeleccionado('banco')}
                     className="flex items-center justify-center p-4 h-auto"
                   >
-                    <Bank className="mr-2 h-5 w-5" />
+                    <Building2 className="mr-2 h-5 w-5" />
                     <div>
                       <div className="font-semibold">Transferencia</div>
                       <div className="text-xs">Bancaria</div>
