@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -10,11 +9,15 @@ import {
   Wallet,
   Home,
   Gift,
-  Play
+  Play,
+  Trophy,
+  Gamepad2,
+  BarChart3
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const { usuario, cerrarSesion } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,49 +37,47 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="bg-white shadow-md border-b">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex justify-between items-center">
+    <header className="bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
           {/* Logo y Navegación */}
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-2 rounded-lg">
-                <div className="text-xl font-bold">B</div>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">BingoMax</h1>
-                <p className="text-xs text-gray-500">Sistema Integral</p>
-              </div>
-            </div>
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="flex items-center space-x-2">
+              <Trophy className="h-8 w-8" />
+              <span className="text-xl font-bold">🎉 RIFAS GARNÚ</span>
+            </Link>
             
-            {/* Navegación */}
-            <nav className="hidden md:flex space-x-1">
-              <Button
-                variant={isActive('/') ? 'default' : 'ghost'}
-                onClick={() => navegarA('/')}
-                className="flex items-center space-x-2"
+            <nav className="hidden md:flex space-x-6">
+              <Link 
+                to="/" 
+                className="hover:text-yellow-300 transition-colors flex items-center space-x-1"
               >
                 <Home className="h-4 w-4" />
-                <span>Dashboard</span>
-              </Button>
-              
-              <Button
-                variant={isActive('/rifas') ? 'default' : 'ghost'}
-                onClick={() => navegarA('/rifas')}
-                className="flex items-center space-x-2"
+                <span>Inicio</span>
+              </Link>
+              <Link 
+                to="/rifas" 
+                className="hover:text-yellow-300 transition-colors flex items-center space-x-1"
               >
                 <Gift className="h-4 w-4" />
                 <span>Rifas</span>
-              </Button>
-              
-              <Button
-                variant={isActive('/bingo-vivo') ? 'default' : 'ghost'}
-                onClick={() => navegarA('/bingo-vivo')}
-                className="flex items-center space-x-2"
+              </Link>
+              <Link 
+                to="/bingo-vivo" 
+                className="hover:text-yellow-300 transition-colors flex items-center space-x-1"
               >
-                <Play className="h-4 w-4" />
+                <Gamepad2 className="h-4 w-4" />
                 <span>Bingo en Vivo</span>
-              </Button>
+              </Link>
+              {esAdminOVendedor && (
+                <Link 
+                  to="/dashboard" 
+                  className="hover:text-yellow-300 transition-colors flex items-center space-x-1"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  <span>Panel</span>
+                </Link>
+              )}
             </nav>
           </div>
 
