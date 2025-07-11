@@ -31,7 +31,7 @@ const CartonBingo: React.FC<CartonBingoProps> = ({
 
   const verificarLinea = () => {
     // Verificar líneas horizontales
-    for (let fila of carton.numeros) {
+    for (const fila of carton.numeros) {
       if (fila.every(num => numerosLlamados.includes(num))) {
         return true;
       }

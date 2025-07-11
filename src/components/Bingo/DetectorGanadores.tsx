@@ -21,7 +21,7 @@ const DetectorGanadores: React.FC<DetectorGanadoresProps> = ({ cartones, numeros
   
   const verificarLinea = (carton: Carton): boolean => {
     // Verificar líneas horizontales
-    for (let fila of carton.numeros) {
+    for (const fila of carton.numeros) {
       if (fila.every(num => numerosLlamados.includes(num))) {
         return true;
       }
